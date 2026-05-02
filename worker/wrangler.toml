@@ -1,0 +1,24 @@
+name = "cyberparent"
+main = "index.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# KV namespace for metrics (no screenshots stored)
+# Create with: npx wrangler kv:namespace create CYBERPARENT_KV
+[[kv_namespaces]]
+binding = "CYBERPARENT_KV"
+id = "1b138bd182a0497fab8dd6f003f0ba25"
+
+# Secrets — set with: npx wrangler secret put GROQ_API_KEY
+# Required secrets:
+#   GROQ_API_KEY          — from console.groq.com
+#   TELEGRAM_BOT_TOKEN    — from @BotFather
+#   TELEGRAM_CHAT_ID      — your personal chat ID (use /start in the bot)
+#
+# Optional (defaults shown):
+#   THRESHOLD_BLOCK = "70"
+#   THRESHOLD_WARN  = "30"
+
+[vars]
+THRESHOLD_BLOCK = "70"
+THRESHOLD_WARN = "30"
