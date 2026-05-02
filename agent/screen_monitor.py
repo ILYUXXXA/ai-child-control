@@ -183,16 +183,58 @@ class ScreenMonitor:
         risk = result.get("risk", 0)
         reason = result.get("reason", "")
         threat_type = result.get("threat_type", "safe")
-
+        
         if action == "block":
-            self.log.warning("BLOCK — risk=%d type=%s reason=%s", risk, threat_type, reason)
+            # Проверяем, не является ли угроза ложной (например, сам агент)
+            if "CyberParent" in reason or "монитор" in reason or "агент" in reason:
+                self.log.info("Skipping false-positive block: agent self-detection")
+                return
+                
+            # Запрос разрешения перед блокировкой
+            self.log.warning("BLOCK requested — risk=%d type=%s reason=%s", risk, threat_type, reason)
+            
+            # Показываем диалог запроса разрешения
+            if self._request_permission(reason, threat_type):
+                self.log.info("User denied block action")
+                return
+            
+            # Если пользователь разрешил блокировку
             show_block_overlay()
+            
         elif action == "warn":
-            self.log.warning("WARN  — risk=%d type=%s reason=%s", risk, threat_type, reason)
+            self.log.warning("WARN — risk=%d type=%s reason=%s", risk, threat_type, reason)
             msg = f"Подозрительная активность ({risk}%): {reason}"
+            # Показываем предупреждение без блокировки
             show_toast(msg)
         else:
             self.log.debug("ALLOW — risk=%d", risk)
+
+    def _request_permission(self, reason: str, threat_type: str) -> bool:
+        """Запрашивает у пользователя разрешение на блокировку.
+        Возвращает True, если блокировать НЕ нужно (пользователь отклонил),
+        False — если блокировать можно."""
+        import tkinter as tk
+        from tkinter import messagebox
+        
+        # Создаём временное окно
+        root = tk.Tk()
+        root.withdraw()  # Скрываем главное окно
+        root.attributes('-topmost', True)  # Поверх всех окон
+        
+        # Диалог с вопросом
+        answer = messagebox.askyesno(
+            "CyberParent AI — Запрос блокировки",
+            f"⚠️ Обнаружена потенциальная угроза!\n\n"
+            f"Тип: {threat_type}\n"
+            f"Описание: {reason}\n\n"
+            f"Заблокировать это действие?",
+            icon='warning'
+        )
+        
+        root.destroy()
+        
+        # Возвращаем True, если пользователь сказал "НЕТ" (не блокировать)
+        return not answer
 
     def run(self):
         self.log.info("CyberParent AI monitor started. Device: %s", self.cfg["device_id"])

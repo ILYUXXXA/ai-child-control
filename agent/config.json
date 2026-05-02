@@ -1,7 +1,7 @@
 {
   "worker_url": " https://cyberparent.parentsecurity.workers.dev",
   "device_id": "child-pc-1",
-  "interval_seconds": 4,
+  "interval_seconds": 10,
   "jpeg_quality": 70,
   "cache_ttl_seconds": 5,
   "log_file": "monitor.log",
@@ -9,5 +9,14 @@
   "telegram_bot_token": "8400300238:AAFLYXCQh9QLSOFWRKP9-X7KJfNDiy1PPIk",
   "telegram_chat_id": "1708468102",
   "webhook_secret": "1811ILYA2009",
-  "webhook_port": 8080
+  "webhook_port": 8080,
+
+  "parent_rules": {
+    "block_phishing": true,
+    "block_malware": true,
+    "block_credential_theft": true,
+    "block_gambling": false,
+    "block_adult": false,
+    "custom_block_keywords": []
+  }
 }
